@@ -3,9 +3,63 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/output.css">
         <title>Games Collection</title>
     </head>
     <body>
         <%- include('header') %>
+        <div class="w-full flex flex-col items-center">
+            <div class="w-full relative py-8 flex flex-col gap-4 items-center">
+                <h1 class="text-2xl">Current Playlist</h1>
+                <button class="fltr-btn border rounded-md py-2 px-4 hover:bg-indigo-400 hover:text-white">Filter</button>
+                <form action="/filter" method="get" class="fltr-ctrl absolute top-3/4 left-1/2 z-10 bg-white hidden border rounded-md flex flex-col gap-4 p-3">
+                    <div class="flex flex-col gap-2">
+                        <label for="developer">By Developer</label>
+                        <select name="developer" id="developer">
+                            <option value="All">All</option>
+                            <% developers.forEach((dev) => { %>
+                                <option value="<%= dev.developer %>"><%= dev.developer %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label for="genre">By Genre</label>
+                        <select name="genre" id="genre">
+                            <option value="All">All</option>
+                            <% genre.forEach((gen) => { %>
+                                <option value="<%= gen.genre %>"><%= gen.genre %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                    <button type="submit" class="fltr-apply border rounded-md py-2 px-4 hover:bg-indigo-400 hover:text-white">Apply</button>
+                    <button type="reset" class="fltr-cancel border rounded-md py-2 px-4 hover:bg-red-500 hover:text-white">Cancel</button>
+                </form>
+            </div>
+            <ul class="flex flex-wrap gap-3">
+                <% games.forEach((game) => { %>
+                    <li class="rounded-md border flex flex-col gap-2 p-2">
+                        <div class="w-60 h-60"><img class="w-full h-full object-contain object-center" src="<%= game.img_url %>" alt="<%= game.title %>"></div>
+                        <p class="text-wrap w-60 text-center"><%= game.title %></p>
+                    </li>
+                <% }); %>
+            </ul>
+        </div>
     </body>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const fltrbtn = document.querySelector('.fltr-btn');
+            const filtr = document.querySelector('.fltr-ctrl');
+            const fltrapply = document.querySelector('.fltr-apply');
+            const fltrcancel = document.querySelector('.fltr-cancel');
+            fltrbtn.addEventListener('click', () => {
+                filtr.classList.toggle('hidden');
+            });
+            fltrapply.addEventListener('click', () => {
+                filtr.classList.add('hidden');
+            });
+            fltrcancel.addEventListener('click', () => {
+                filtr.classList.add('hidden');
+            });
+        })
+    </script>
 </html>
