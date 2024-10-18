@@ -7,12 +7,12 @@ async function getAllGames(){
 }
 
 async function getAllDevelopers(){
-    const {rows} = await pool.query('SELECT * FROM developers');
+    const {rows} = await pool.query('SELECT DISTINCT developer FROM developers ORDER BY developer ASC');
     return rows;
 }
 
 async function getAllGenre(){
-    const {rows} = await pool.query('SELECT * FROM genre');
+    const {rows} = await pool.query('SELECT DISTINCT genre FROM genre ORDER BY genre ASC');
     return rows;
 }
 

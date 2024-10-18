@@ -25,24 +25,24 @@ const gamesController = {
             async (req, res) => {
                 const developerQuery = req.query.developer;
                 const genreQuery = req.query.genre;
-                const games = await db.filterGames(developerQuery, genreQuery);
-                const developers = await db.getAllDevelopers();
-                const genre = await db.getAllGenre();
-
-                if(games === 'All'){
+                if(developerQuery === 'All' && genreQuery === 'All'){
                     res.redirect('/');
+                }else{
+                    const games = await db.filterGames(developerQuery, genreQuery);
+                    const developers = await db.getAllDevelopers();
+                    const genre = await db.getAllGenre();
+                    if(!games) {
+                        throw new NotFoundError('No games found');
+                    }
+                    if(!developers) {
+                        throw new NotFoundError('No developer found');
+                    }
+                    if(!genre) {
+                        throw new NotFoundError('No genre found');
+                    }
+    
+                    res.render('index', {games, developers, genre});
                 }
-                if(!games) {
-                    throw new NotFoundError('No games found');
-                }
-                if(!developers) {
-                    throw new NotFoundError('No developer found');
-                }
-                if(!genre) {
-                    throw new NotFoundError('No genre found');
-                }
-
-                res.render('index', {games, developers, genre});
         })
 };
 

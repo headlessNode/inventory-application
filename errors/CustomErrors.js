@@ -22,8 +22,6 @@ class CustomInternalServerError extends Error {
     }
 }
 
-
-
 module.exports = {
     CustomNotFoundError,
     CustomBadRequestError,
