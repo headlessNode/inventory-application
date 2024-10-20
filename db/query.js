@@ -45,9 +45,18 @@ async function filterGames(developer, genre){
     }
 }
 
+async function updateGame(id, title, img_url){
+    await pool.query(
+        `UPDATE games
+        SET title = $1, img_url = $2
+        WHERE games.id = ${id}`, [title, img_url]
+    );
+}
+
 module.exports = {
     getAllGames,
     getAllDevelopers,
     getAllGenre,
-    filterGames
+    filterGames,
+    updateGame
 };
