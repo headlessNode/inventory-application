@@ -1,12 +1,19 @@
 const db = require('../db/query.js');
 const asyncHandler = require('express-async-handler');
 const {body, validationResult} = require('express-validator');
+require('dotenv').config();
 
 const urlErr = "Invalid URL. Must match https://https://i.imgur.com/*.png";
+
+const authErr = "Wrong auth code. Please try again.";
 
 const validateUrl = [
     body("img_url").trim().matches(/https:\/\/i.imgur.com\/[a-zA-Z0-9]+/).withMessage(urlErr)
 ];
+
+const validateAuth = [
+    body("auth_code").trim().isNumeric().equals(process.env.AUTH_KEY).withMessage(authErr)
+]
 
 const dashboardController = {
     getAll: asyncHandler(
@@ -66,7 +73,35 @@ const dashboardController = {
                 res.redirect('/admin');
             }
         )
-    ]
+    ],
+
+    authorize: asyncHandler(
+        async (req, res) => {
+            const {id} = req.body;
+            res.render('authorize', {id});
+        }
+    ),
+
+    deleteGame: [
+        validateAuth,
+        asyncHandler(
+            async (req, res) => {
+                const errors = validationResult(req);
+                if (!errors.isEmpty()) {
+                    const games = await db.getAllGames();
+                    const developers = await db.getAllDevelopers();
+                    const genre = await db.getAllGenre();
+                    return res.render('errorPage', {
+                        errors: errors.array(),
+                    });
+                }
+                const {game_id} = req.body;
+                await db.deleteGame(game_id);
+                res.redirect('/');
+            }
+        )
+    ],
+
 }
 
 module.exports = dashboardController;

@@ -133,6 +133,12 @@ async function updateGenre(id, game_id, genre){
     );
 }
 
+async function deleteGame(id){
+    await pool.query('DELETE FROM developers WHERE developers.game_id = $1', [id]);
+    await pool.query('DELETE FROM genre WHERE genre.game_id = $1', [id]);
+    await pool.query('DELETE FROM games WHERE games.id = $1', [id]);
+}
+
 module.exports = {
     getAllGames,
     getAllDevelopers,
@@ -142,5 +148,6 @@ module.exports = {
     filterGames,
     updateGame,
     updateGenre,
-    updateDeveloper
+    updateDeveloper,
+    deleteGame
 };

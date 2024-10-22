@@ -10,7 +10,7 @@
         <% games.forEach((game) => { %>
             <form action="/admin/updategame" method="post" class="game-form form-<%=game.id%> flex flex-col gap-4 <% if(game.id !== 1) { %> hidden <% } %>">
                 <input type="hidden" name="id" value="<%= game.id %>">
-                <div class="flex gap-3">
+                <div class="flex flex-wrap justify-center items-center gap-3">
                     <div class="flex flex-col gap-2">
                         <label for="title">Game Title</label>
                         <input class="border py-2 px-4 rounded-md " type="text" name="title" id="title" value="<%= game.title %>" required>
@@ -20,7 +20,7 @@
                         <input type="url" class="border px-4 py-2 rounded-md" name="img_url" id="img_url" value="<%= game.img_url %>" required>
                     </div>
                 </div>
-                <div class="flex gap-3">
+                <div class="flex flex-wrap justify-center items-center gap-3">
                     <% let gameDevs = developers.filter(developer => developer.game_id === game.id); %>
                     <div class="flex flex-col gap-2">
                         <label for="developers[]">Developers</label>
