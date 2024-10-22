@@ -12,49 +12,36 @@
             <h1 class="text-2xl py-8">Admin Dashboard</h1>
         </div>
         <main class="flex flex-wrap justify-center items-center">
-            <div class="form-container flex flex-wrap justify-center items-center">
-                <fieldset class="border border-indigo-600 rounded-md p-3">
-                    <legend class="bg-indigo-400 p-2 text-white">Update Game Information</legend>
-                    <%- include("partials/errors.ejs") %>
-                    <div class="flex gap-5 flex-wrap justify-center items-center">
-                        <div class="game-btns flex flex-col gap-4">
-                            <% games.forEach(game => { %>
-                                <button class="w-60 border truncate game-btn py-2 px-4 rounded-md <%if(game.id === 1) { %> active <% } %> [&.active]:bg-indigo-400 [&.active]:text-white " data-game="<%= game.id %>"><%= game.title %></button>
-                            <% }) %>
-                        </div>
-                        <% games.forEach((game) => { %>
-                            <%= console.log(game)%>
-                            <form action="/admin/updategame" method="post" class="form-<%=game.id%> flex flex-col gap-4 <% if(game.id !== 1) { %> hidden <% } %>">
-                                <input type="hidden" name="id" value="<%= game.id %>">
-                                <input class="border py-2 px-4 rounded-md" type="text" name="title" id="title" value="<%= game.title %>" required>
-                                <input type="url" class="border px-4 py-2 rounded-md" name="img_url" id="img_url" value="<%= game.img_url %>" required>
-                                <button class="border rounded-md py-2 px-4 hover:bg-indigo-400 hover:text-white" type="submit">Update</button>
-                                <button class="border rounded-md py-2 px-4 hover:bg-red-500 hover:text-white" type="reset">Cancel</button>
-                            </form>
-                        <% }) %>
-                    </div>
-                </fieldset>
+            <div class="game-form-container flex flex-wrap justify-center items-start">
+                <%- include('partials/updateGameInfo.ejs') %>
             </div>
         </main>
     </body>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const gameBtns = document.querySelectorAll('.game-btn');
-            const forms = document.querySelectorAll('.form-container form');
-            gameBtns.forEach((gameBtn) => {
-                gameBtn.addEventListener('click', (e) => {
-                    gameBtns.forEach((btn) => {
-                        btn.classList.remove('active');
+            const toggleForms = (containerClass, buttonClass) => {
+                const buttons = document.querySelectorAll(buttonClass);
+                const forms = document.querySelectorAll(`${containerClass} form`);
+                
+                buttons.forEach((button) => {
+                    button.addEventListener('click', (e) => {
+                        buttons.forEach((btn) => {
+                            btn.classList.remove('active');
+                        });
+                        button.classList.add('active');
+                        forms.forEach((form) => {
+                            form.classList.add('hidden');
+                        });
+                        let id = button.getAttribute('data-game');
+                        const form = document.querySelector(`${containerClass} .form-${id}`);
+                        form.classList.remove('hidden');
                     });
-                    forms.forEach((form) => {
-                        form.classList.add('hidden');
-                    });
-                    const gameId = gameBtn.getAttribute('data-game');
-                    const form = document.querySelector(`.form-${gameId}`);
-                    form.classList.remove('hidden');
-                    gameBtn.classList.add('active'); 
-                })
-            })
-        })
+                });
+            };
+
+            toggleForms('.game-form-container', '.game-btn');
+            toggleForms('.dev-form-container', '.dev-btn');
+            toggleForms('.genre-form-container', '.genre-btn');
+        });
     </script>
 </html>

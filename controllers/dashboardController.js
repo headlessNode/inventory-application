@@ -5,7 +5,7 @@ const {body, validationResult} = require('express-validator');
 const urlErr = "Invalid URL. Must match https://https://i.imgur.com/*.png";
 
 const validateUrl = [
-    body("img_url").trim().matches(/https:\/\/i.imgur.com\/[a-zA-Z0-9]+\.png/).withMessage(urlErr)
+    body("img_url").trim().matches(/https:\/\/i.imgur.com\/[a-zA-Z0-9]+/).withMessage(urlErr)
 ];
 
 const dashboardController = {
@@ -13,8 +13,8 @@ const dashboardController = {
         async (req, res) => {
             const games = await db.getAllGames();
             const developers = await db.getAllDevelopers();
-            const genre = await db.getAllGenre();
-            res.render('adminDashboard', {games, developers, genre});
+            const genres = await db.getAllGenre();
+            res.render('adminDashboard', {games, developers, genres});
         }),
     
     updateGame: [
@@ -22,7 +22,7 @@ const dashboardController = {
         asyncHandler(
             async (req, res) => {
                 const errors = validationResult(req);
-                console.log(errors.array());
+
                 if (!errors.isEmpty()) {
                     const games = await db.getAllGames();
                     const developers = await db.getAllDevelopers();
@@ -34,8 +34,35 @@ const dashboardController = {
                         errors: errors.array(),
                     });
                 }
-                const {id, title, img_url} = req.body;
+                
+                const {id, title, img_url, developers, developerIds, genres, genreIds} = req.body;
+
+                const game_id = id;
+                let gameDevs = [];
+                developers.forEach((developer, i) => {
+                    gameDevs.push({
+                        id: developerIds[i],
+                        developer
+                    });
+                });
+
+                let gameGenres = [];
+                genres.forEach((genre, i) => {
+                    gameGenres.push({
+                        id: genreIds[i],
+                        genre
+                    });
+                });
+                await Promise.all(gameDevs.map(async (dev) => {
+                    await db.updateDeveloper(dev.id, game_id, dev.developer);
+                }));
+                
+                await Promise.all(gameGenres.map(async (gen) => {
+                    await db.updateGenre(gen.id, game_id, gen.genre);
+                }));
+                
                 await db.updateGame(id, title, img_url);
+                
                 res.redirect('/admin');
             }
         )

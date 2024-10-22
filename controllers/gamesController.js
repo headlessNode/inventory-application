@@ -6,8 +6,8 @@ const gamesController = {
         getAll: asyncHandler(
             async (req, res) => {
             const games = await db.getAllGames();
-            const developers = await db.getAllDevelopers();
-            const genre = await db.getAllGenre();
+            const developers = await db.getAllDevelopersWithoutIds();
+            const genre = await db.getAllGenreWithoutIds();
 
             if(!games) {
                 throw new NotFoundError('No games found');
@@ -29,8 +29,8 @@ const gamesController = {
                     res.redirect('/');
                 }else{
                     const games = await db.filterGames(developerQuery, genreQuery);
-                    const developers = await db.getAllDevelopers();
-                    const genre = await db.getAllGenre();
+                    const developers = await db.getAllDevelopersWithoutIds();
+                    const genre = await db.getAllGenreWithoutIds();
                     if(!games) {
                         throw new NotFoundError('No games found');
                     }

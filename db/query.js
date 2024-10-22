@@ -4,7 +4,7 @@ const pool = require('./pool.js');
 /**
  * Retrieves all games from the database.
  *
- * @return {Promise<Object[]>} The result of the query as an array of objects, where each object represents a game.
+ * @return {object} Returns an array of objects, where each object represents a game.
  */
 async function getAllGames(){
     const {rows} = await pool.query('SELECT * FROM games');
@@ -14,20 +14,39 @@ async function getAllGames(){
 /**
  * Retrieves all distinct developers from the database.
  *
- * @return {Promise<Object[]>} The result of the query as an array of objects, where each object has a 'developer' property.
+ * @return {object} Returns an array of objects, where each object has an 'id', 'developer' and 'game_id property.
  */
 async function getAllDevelopers(){
+    const {rows} = await pool.query('SELECT DISTINCT id, developer, game_id FROM developers ORDER BY developer ASC');
+    return rows;
+}
+
+/**
+ * Retrieves all distinct developers from the database.
+ *
+ * @return {object} Returns an array of objects, where each object has a 'developer' property.
+ */
+async function getAllDevelopersWithoutIds(){
     const {rows} = await pool.query('SELECT DISTINCT developer FROM developers ORDER BY developer ASC');
     return rows;
 }
 
+/**
+ * Retrieves all distinct genres from the database.
+ *
+ * @return {object} Returns an array of objects, where each object has a 'genre' and 'game_id' property.
+ */
+async function getAllGenre(){
+    const {rows} = await pool.query('SELECT DISTINCT id, genre, game_id FROM genre ORDER BY genre ASC');
+    return rows;
+}
 
 /**
  * Retrieves all distinct genres from the database.
  *
- * @return {Promise<Object[]>} The result of the query as an array of objects, where each object has a 'genre' property.
+ * @return {object} Returns an array of objects, where each object has a 'genre' property.
  */
-async function getAllGenre(){
+async function getAllGenreWithoutIds(){
     const {rows} = await pool.query('SELECT DISTINCT genre FROM genre ORDER BY genre ASC');
     return rows;
 }
@@ -37,7 +56,7 @@ async function getAllGenre(){
  *
  * @param {String} developer The developer to filter by.
  * @param {String} genre The genre to filter by.
- * @return {Promise<Object[]>|String} The result of the query.
+ * @return {object} Returns an array of filtered game objects.
  */
 async function filterGames(developer, genre){
     if(developer === 'All' && genre === 'All'){
@@ -84,10 +103,44 @@ async function updateGame(id, title, img_url){
     );
 }
 
+/**
+ * Updates the developer of a game with the given id.
+ *
+ * @param {Number} id The id of the game to update.
+ * @param {String} developer The new developer of the game.
+ * @return {void} Returns void.
+ */
+async function updateDeveloper(id, game_id, developer){
+    await pool.query(
+        `UPDATE developers
+        SET developer = $1
+        WHERE developers.game_id = ${game_id} AND developers.id = ${id}`, [developer]
+    );
+}
+
+/**
+ * Updates the genre of a game with the given id.
+ *
+ * @param {Number} id The id of the game to update.
+ * @param {String} genre The new genre of the game.
+ * @return {void} Returns void.
+ */
+async function updateGenre(id, game_id, genre){
+    await pool.query(
+        `UPDATE genre
+        SET genre = $1
+        WHERE genre.game_id = ${game_id} AND genre.id = ${id}`, [genre]
+    );
+}
+
 module.exports = {
     getAllGames,
     getAllDevelopers,
+    getAllDevelopersWithoutIds,
     getAllGenre,
+    getAllGenreWithoutIds,
     filterGames,
-    updateGame
+    updateGame,
+    updateGenre,
+    updateDeveloper
 };
