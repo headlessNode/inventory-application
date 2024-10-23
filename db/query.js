@@ -133,10 +133,55 @@ async function updateGenre(id, game_id, genre){
     );
 }
 
+/**
+ * Deletes a game and its associated developers and genres from the database.
+ *
+ * @param {Number} id The id of the game to delete.
+ * @return {void} Returns void.
+ */
 async function deleteGame(id){
     await pool.query('DELETE FROM developers WHERE developers.game_id = $1', [id]);
     await pool.query('DELETE FROM genre WHERE genre.game_id = $1', [id]);
     await pool.query('DELETE FROM games WHERE games.id = $1', [id]);
+}
+
+/**
+ * Adds a new game to the database along with its developers and genres.
+ *
+ * @param {String} title The title of the game.
+ * @param {String} img_url The image URL of the game.
+ * @param {Array} developers An array of developers associated with the game.
+ * @param {Array} genres An array of genres associated with the game.
+ * @return {void} Returns void.
+ */
+async function addGame(title, img_url, developers, genres){
+    await pool.query(
+        `INSERT INTO games
+        (title, img_url)
+        VALUES
+        ($1, $2)`, [title, img_url]
+    );
+
+    const {rows} = await pool.query('SELECT id FROM games WHERE title = $1', [title]);
+    const game_id = rows[0].id;
+
+    developers.forEach(async (developer) => {
+        await pool.query(
+            `INSERT INTO developers
+            (developer, game_id)
+            VALUES
+            ($1, $2)`, [developer, game_id]
+        );
+    });
+
+    genres.forEach(async (genre) => {
+        await pool.query(
+            `INSERT INTO genre
+            (genre, game_id)
+            VALUES
+            ($1, $2)`, [genre, game_id]
+        );
+    });
 }
 
 module.exports = {
@@ -149,5 +194,6 @@ module.exports = {
     updateGame,
     updateGenre,
     updateDeveloper,
-    deleteGame
+    deleteGame,
+    addGame
 };

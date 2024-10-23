@@ -4,6 +4,8 @@ const dashboardController = require('../controllers/dashboardController.js');
 
 dashboardRouter.get('/', dashboardController.getAll);
 
+dashboardRouter.post('/addgame', dashboardController.addGame);
+
 dashboardRouter.post('/updategame', dashboardController.updateGame);
 
 dashboardRouter.post('/authorize', dashboardController.authorize);

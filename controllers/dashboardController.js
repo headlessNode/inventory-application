@@ -3,12 +3,12 @@ const asyncHandler = require('express-async-handler');
 const {body, validationResult} = require('express-validator');
 require('dotenv').config();
 
-const urlErr = "Invalid URL. Must match https://https://i.imgur.com/*.png";
+const urlErr = "Invalid URL. Must match https://https://i.imgur.com/*.extension";
 
 const authErr = "Wrong auth code. Please try again.";
 
 const validateUrl = [
-    body("img_url").trim().matches(/https:\/\/i.imgur.com\/[a-zA-Z0-9]+/).withMessage(urlErr)
+    body("img_url").trim().matches(/https:\/\/i.imgur.com\/[a-zA-Z0-9]+./).withMessage(urlErr)
 ];
 
 const validateAuth = [
@@ -29,7 +29,6 @@ const dashboardController = {
         asyncHandler(
             async (req, res) => {
                 const errors = validationResult(req);
-
                 if (!errors.isEmpty()) {
                     const games = await db.getAllGames();
                     const developers = await db.getAllDevelopers();
@@ -88,9 +87,6 @@ const dashboardController = {
             async (req, res) => {
                 const errors = validationResult(req);
                 if (!errors.isEmpty()) {
-                    const games = await db.getAllGames();
-                    const developers = await db.getAllDevelopers();
-                    const genre = await db.getAllGenre();
                     return res.render('errorPage', {
                         errors: errors.array(),
                     });
@@ -101,6 +97,27 @@ const dashboardController = {
             }
         )
     ],
+
+    addGame: [
+        validateUrl,
+        asyncHandler(
+            async (req, res) => {
+                const errors = validationResult(req);
+                if (!errors.isEmpty()) {
+                    const games = await db.getAllGames();
+                    const developers = await db.getAllDevelopers();
+                    const genre = await db.getAllGenre();
+                    return res.render('errorPage', {
+                        errors: errors.array(),
+                    });
+                }
+                const {title, img_url, developers, genres} = req.body;
+                console.log(req.body);
+                await db.addGame(title, img_url, developers, genres);
+                res.redirect('/');
+            }
+        )
+    ]
 
 }
 
